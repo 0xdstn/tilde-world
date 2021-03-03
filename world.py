@@ -558,7 +558,7 @@ active = True
 while active == True:
 
     # Display a prompt
-    cmd = input('> ')
+    cmd = input('> ').strip()
 
     # CMD: look (object)
     if cmd.startswith('look ') and len(cmd) > 5: lookObj(cmd)
