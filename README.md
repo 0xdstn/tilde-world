@@ -113,11 +113,26 @@ Actions currently support the following:
 As a user of the game you can run the following commands:
 
 - `look` - View the room along with it's objects and exits
-- `look object` - View the provided item and it's actions
-- `grab object` - Add the provided item to the inventory
-- `drop object` - Remove the provided item from the inventory
+- `look [object]` - View the provided object and it's actions
+- `grab [object]` - Add the provided object to the inventory
+- `drop [object]` - Remove the provided object from the inventory
+- `[action] [object]` - Runs the provided action on the provided object
 - `inventory` - List the inventory
-- `go direction` - Go the provided direction (north,south,east,west)
-- `teleport x y` - Go to the provided coordinates
+- `go [direction]` - Go the provided direction (north, south, east, west)
+- `teleport [x] [y]` - Go to the provided coordinates
 - `quit` - Quit ~world
-- `action object` - Runs the provided action on the provided object
+- `help` - Displays the help menu
+- `about` - Displays information about the author and project
+
+2 Future plans
+
+- Add more action logic
+- Add actions to inventory items
+- Add ability to wall off exits
+- Add ability to make an exit teleport
+
+2 Release notes
+
+- `v1.0.1` Added help and about commands
+- `v1.0.0` Initial release with base functionality
+

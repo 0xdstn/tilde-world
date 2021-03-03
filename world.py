@@ -286,9 +286,11 @@ def lookObj(cmd):
                 for prop in obj.props:
                     desc = desc.replace('[' + prop.key + ']', prop.value)
             prnt(desc)
-            if len(obj.actions):
+            if len(obj.actions) or obj.grab:
                 print('')
                 actionsOut = ['You can:']
+                if obj.grab:
+                    actionsOut.append('- grab')
                 for actn in obj.actions:
                     actionsOut.append('- ' + actn.triggers[0])
                 prnt(actionsOut)
@@ -475,6 +477,26 @@ def objCmd(cmd):
     if not found:
         prnt('Command not found')
 
+def help():
+    prnt('Commands:')
+    print('')
+    prnt('look               View the room along with it\'s objects and exits')
+    prnt('look [object]      View the provided object and it\'s actions')
+    prnt('grab [object]      Add the provided object to the inventory')
+    prnt('drop [object]      Remove the provided object from the inventory')
+    prnt('[action] [object]  Runs the provided action on the provided object')
+    prnt('inventory          List the inventory')
+    prnt('go [direction]     Go to the provided direction (north, south, east west)')
+    prnt('teleport [x] [y]   Go to the provided coordinates')
+    prnt('quit               Quit ~world')
+    prnt('help               Displays this menu')
+    prnt('about              Displays information about the author and project')
+
+def about():
+    prnt('Version:      1.0.1')
+    prnt('Author:       ~dustin')
+    prnt('Source:       https://github.com/0xdstn/tilde-world')
+    prnt('More info:    https://tilde.town/~dustin/projects/tilde-world')
 
 if not os.path.exists(configPath):
     print('')
@@ -552,6 +574,10 @@ while active == True:
     elif cmd.startswith('go ') and cmd[3:] in validDirections: go(cmd)
     # CMD: teleport
     elif cmd.startswith('teleport'): teleport(cmd) 
+    # CMD: help 
+    elif cmd == 'help': help()
+    # CMD: help 
+    elif cmd == 'about': about()
     # CMD: quit
     elif cmd == 'quit' or cmd == 'exit': active = False
     # CMD: obj commands
