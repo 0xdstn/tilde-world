@@ -133,6 +133,8 @@ def getRoom(x, y):
             inProp = False
             inAction = False
             for line in roomLines:
+                if line.strip() == '':
+                    continue
                 if line[0] != ' ':
                     inProp = False
                     inAction = False
