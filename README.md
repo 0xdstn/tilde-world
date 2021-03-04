@@ -14,9 +14,9 @@ When the game is looking for a room at a coordinate, it will loop through all of
 
 Your current position is saved in **~/.world/loc** in the format **x,y**.
 
-Your inventory is saved in **~/.world/inventory**. Each item goes on one line in the format **key : Name : Description**.
+Your inventory is saved in **~/.world/inventory**. Each item goes on one line in the format **key : x,y**. The x,y is the room the object came from so we can reference it's data again.
 
-The state for props are saved in `~/.world/state`. It saves in the format **x_y_object_prop.txt**. As props change via user interaction, these files are updated. They are created upon entering a room with an object that has a prop.
+The state for props are saved in `~/.world/state`. It saves in the format **object_prop.txt**. As props change via user interaction, these files are updated. They are created upon entering a room with an object that has a prop.
 
 ## Creating rooms
 
