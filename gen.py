@@ -33,6 +33,7 @@ for u in users:
                 rFile.write('<html><head><style type="text/css">a{color:#00aaee;text-decoration:none;}body{background:#2c2c2c;color:#fff;font-family:monospace;}</style></head><body><pre>')
 
                 rFile.write('[' + coords[0] + ',' + coords[1] + ']<br><br>')
+                rFile.write('Created by ~' + u + '<br><br>')
 
                 for line in roomLines:
                     rFile.write(line + '<br>')
@@ -51,8 +52,13 @@ for u in users:
                 if highestY < y: highestY = y
                 if lowestY > y: lowestY = y
 
-for y in range(lowestY-1,highestY+2):
-    for x in range(lowestX-1,highestX+2):
+lowY = lowestY-1 if lowestY < -10 else -11
+highY = highestY+2 if highestY > 10 else 12
+lowX = lowestX-1 if lowestX < -10 else -11
+highX = highestX+2 if highestX > 10 else 12
+
+for y in range(lowY,highY):
+    for x in range(lowX,highX):
         found = False
         r = []
         for room in foundRooms:

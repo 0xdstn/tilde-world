@@ -194,14 +194,14 @@ def getRoom(x, y):
 
         if 'north' not in room.exits:
             tmpX = x
-            tmpY = y + 1
+            tmpY = y - 1
             northPath = roomsPath.replace(username,u) + str(tmpX).replace('-','n') + '_' + str(tmpY).replace('-','n')
             if os.path.exists(northPath):
                 room.exits.append('north')
         
         if 'south' not in room.exits:
             tmpX = x
-            tmpY = y - 1
+            tmpY = y + 1
             southPath = roomsPath.replace(username,u) + str(tmpX).replace('-','n') + '_' + str(tmpY).replace('-','n')
             if os.path.exists(southPath):
                 room.exits.append('south')
@@ -370,11 +370,11 @@ def go(cmd):
     elif direction in northDirections:
         dirName = 'north'
         tmpX = state.locX
-        tmpY = state.locY + 1
+        tmpY = state.locY - 1
     elif direction in southDirections:
         dirName = 'south'
         tmpX = state.locX
-        tmpY = state.locY - 1
+        tmpY = state.locY + 1
 
     # Try to get the room
     tmpRoom = getRoom(tmpX,tmpY)
@@ -395,6 +395,21 @@ def go(cmd):
     else:
         prnt('There is no exit in that direction')
 
+def moveTo(x,y):
+    # Try to get the room
+    tmpRoom = getRoom(x,y)
+    
+    # Room found
+    if tmpRoom.name != '':
+        state.room = tmpRoom
+        state.locX = x
+        state.locY = y
+        updateLoc(state.locX,state.locY)
+        prnt('Current location: ' + state.room.name + ' (' + str(state.locX) + ',' + str(state.locY) + ')')
+    # No room found
+    else:
+        prnt('There is no room at that location')
+
 def teleport(cmd):
     global state
 
@@ -403,20 +418,7 @@ def teleport(cmd):
     tmpX = int(tmpCoords[0])
     tmpY = int(tmpCoords[1])
     if len(tmpCoords) == 2:
-        # Try to get the room
-        tmpRoom = getRoom(tmpX, tmpY)
-        
-        # Room found
-        if tmpRoom.name != '':
-            state.room = tmpRoom
-            state.locX = tmpX
-            state.locY = tmpY
-            updateLoc(state.locX,state.locY)
-            prnt('You teleported to ' + str(state.locX) + ',' + str(state.locY))
-            prnt('Current location: ' + state.room.name + ' (' + str(state.locX) + ',' + str(state.locY) + ')')
-        # No room found
-        else:
-            prnt('There is no room at that location')
+        moveTo(tmpX,tmpY)
 
 def objCmd(cmd):
     sp = cmd.split(' ')
@@ -461,6 +463,10 @@ def objCmd(cmd):
                                 if runCmd:
                                     if i.startswith('ECHO'):
                                         prnt(i[5:])
+                                    elif i.startswith('TELEPORT'):
+                                        coords = i[9:].split(' ')
+                                        if len(coords) == 2:
+                                            moveTo(int(coords[0]),int(coords[1]))
                                     elif i.startswith('GRAB'):
                                         for obj in state.room.objects:
                                             if obj.id == i[5:]:
@@ -495,7 +501,7 @@ def help():
     prnt('about              Displays information about the author and project')
 
 def about():
-    prnt('Version:      1.0.1')
+    prnt('Version:      1.0.2')
     prnt('Author:       ~dustin')
     prnt('Source:       https://github.com/0xdstn/tilde-world')
     prnt('More info:    https://tilde.town/~dustin/projects/tilde-world')

@@ -133,6 +133,7 @@ As a user of the game you can run the following commands:
 
 2 Release notes
 
+- `v1.0.2` Added TELEPORT action instruction
 - `v1.0.1` Added help and about commands
 - `v1.0.0` Initial release with base functionality
 
