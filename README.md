@@ -107,6 +107,7 @@ Actions currently support the following:
 - `ELSE` - Placed between an **IF** and **ENDIF**. If the IF statement is false, all following instructions until an **ENDIF** will be run
 - `ECHO message` - Prints out the provided message
 - `GRAB object` - Adds the provided object key to the inventory (must also be in the same room, hidden or not)
+- `TELEPORT x y` - Teleports to provided x,y coordinates
 
 ## Game commands
 
