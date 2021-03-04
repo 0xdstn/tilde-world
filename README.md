@@ -128,12 +128,10 @@ As a user of the game you can run the following commands:
 2 Future plans
 
 - Add more action logic
-- Add actions to inventory items
-- Add ability to wall off exits
-- Add ability to make an exit teleport
 
 2 Release notes
 
+- `v1.1.0` Changed inventory system so you can use item actions after grabbing them
 - `v1.0.2` Added TELEPORT action instruction
 - `v1.0.1` Added help and about commands
 - `v1.0.0` Initial release with base functionality

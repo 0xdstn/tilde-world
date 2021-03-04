@@ -26,9 +26,6 @@ class Room:
         self.objects = []
         self.exits = []
         self.key = ''
-        self.user = ''
-        self.x = ''
-        self.y = ''
 
     def setItem(self, key, val):
         if key == 'name': self.name = val
@@ -86,10 +83,8 @@ class State:
         self.locY = 0
         self.inventory = []
 
-def getPropFileName(user, x, y, obj, prop):
+def getPropFileName(obj, prop):
     propFileName = statePath
-    propFileName += str(x).replace('-','n') + '_'
-    propFileName += str(y).replace('-','n') + '_'
     propFileName += obj.id.replace(' ','-') + '_' 
     propFileName += prop + '.txt'
 
@@ -101,13 +96,15 @@ def getInventory():
     inventoryLines = [x.strip('\n') for x in inventoryFile]
     inventoryFile.close()
     for line in inventoryLines:
-        item = Item()
         info = line.split(' : ')
-        if len(info) == 3:
-            item.id = info[0]
-            item.name = info[1]
-            item.desc = info[2]
-            inventory.append(item)
+        if len(info) == 2:
+            coords = info[1].split(',')
+            if len(coords) == 2:
+                tmpRoom = getRoom(int(coords[0]),int(coords[1]))
+                for obj in tmpRoom.objects:
+                    if obj.id == info[0]:
+                        inventory.append(obj)
+                        break
     return inventory
 
 
@@ -122,9 +119,6 @@ def getRoom(x, y):
     for u in users:
         roomPath = roomsPath.replace(username,u) + str(x).replace('-','n') + '_' + str(y).replace('-','n')
         if os.path.exists(roomPath):
-            room.user = u
-            room.x = x
-            room.y = y
             roomData = open(roomPath, 'r')
             roomLines = [x.strip('\n') for x in roomData]
             curObj = Object()
@@ -143,9 +137,11 @@ def getRoom(x, y):
                         room.setItem(pieces[0].lower(),pieces[1])
                 else:
                     if line == '  -':
+                        if inProp:
+                            curObj.props.append(curProp)
+                            inProp = False
                         if inAction:
                             curObj.actions.append(curAction)
-                            curAction = Action()
                             inAction = False
                         if curObj.name != '':
                             objects.append(curObj)
@@ -158,14 +154,16 @@ def getRoom(x, y):
                             curObj.actions.append(curAction)
                             inAction = False
                         inProp = True
+                        curProp = Prop()
                     elif line.startswith('    ACTIONS'):
                         if inProp:
                             curObj.props.append(curProp)
                             inProp = False
                         inAction = True
+                        curAction = Action()
                     elif inProp:
                         pieces = line.strip().split('=')
-                        propFileName = getPropFileName(u, x, y, curObj, pieces[0])
+                        propFileName = getPropFileName(curObj, pieces[0])
 
                         if os.path.exists(propFileName):
                             propFile = open(propFileName,'r')
@@ -190,6 +188,7 @@ def getRoom(x, y):
                 curObj.props.append(curProp)
             if curObj.name != '':
                 objects.append(curObj)
+
             room.setItem('objects',objects)
 
         if 'north' not in room.exits:
@@ -237,12 +236,12 @@ def prnt(value):
 def inInventory(key):
     global state
     found = False
-    for item in state.inventory:
-        if item.id == key:
+    for obj in state.inventory:
+        if obj.id == key:
             found = True
     return found
 
-def addToInventory(obj):
+def addToInventory(obj,x,y):
     global state
 
     owned = inInventory(obj.id)
@@ -251,13 +250,9 @@ def addToInventory(obj):
         prnt('You already have one of these')
     else:
         inventoryFile = open(inventoryPath,'a')
-        inventoryFile.write(obj.id + ' : ' + obj.name + ' : ' + obj.desc + "\n")
+        inventoryFile.write(obj.id + ' : ' + str(x) + ',' + str(y) + "\n")
         inventoryFile.close()
-        item = Item()
-        item.id = obj.id
-        item.name = obj.name
-        item.desc = obj.desc
-        state.inventory.append(item)
+        state.inventory.append(obj)
         prnt('You obtain "' + obj.name + '"')
 
 def removeFromInventory(key):
@@ -268,19 +263,25 @@ def removeFromInventory(key):
     if not owned:
         prnt('This item is not in your inventory')
     else:
+        inventoryFile = open(inventoryPath,'r')
+        inventoryLines = [x for x in inventoryFile]
+        inventoryFile.close()
         inventoryFile = open(inventoryPath,'w')
-        for item in state.inventory:
-            if item.id == key:
-                state.inventory.remove(item)  
-                prnt('You drop "' + item.name + '"')
+        for line in inventoryLines:
+            if line.startswith(key + ' :'):
+                for obj in state.inventory:
+                    if obj.id == key:
+                        state.inventory.remove(obj)  
+                        prnt('You drop "' + obj.name + '"')
             else:
-                inventoryFile.write(item.id + ' : ' + item.name + ' : ' + item.desc + "\n")
+                inventoryFile.write(line)
         inventoryFile.close()
 
 def lookObj(cmd):
     item = cmd[5:]
     found = False
-    for obj in state.room.objects:
+    objects = getAllObjects()
+    for obj in objects:
         if item == obj.id:
             found = True
             desc = obj.desc
@@ -291,7 +292,7 @@ def lookObj(cmd):
             if len(obj.actions) or obj.grab:
                 print('')
                 actionsOut = ['You can:']
-                if obj.grab:
+                if obj.grab and not inInventory(obj.id):
                     actionsOut.append('- grab')
                 for actn in obj.actions:
                     actionsOut.append('- ' + actn.triggers[0])
@@ -307,7 +308,7 @@ def grabObj(cmd):
         if item == obj.id:
             found = True
             if obj.grab:
-                addToInventory(obj)
+                addToInventory(obj,state.locX,state.locY)
             else:
                 prnt('This object is not attainable')
 
@@ -343,10 +344,9 @@ def look():
 def inventory():
     if len(state.inventory):
         output = []
-        for item in state.inventory:
-            output.append('')
-            output.append('- ' + item.name + ' (' + item.id + '): ')
-            output.append('  ' + item.desc)
+        print('')
+        for obj in state.inventory:
+            output.append('- ' + obj.name + ' (' + obj.id + ')')
         prnt(output)
     else:
         print('')
@@ -420,12 +420,22 @@ def teleport(cmd):
     if len(tmpCoords) == 2:
         moveTo(tmpX,tmpY)
 
+def getAllObjects():
+    objects = []
+    ids = []
+    for obj in state.room.objects + state.inventory:
+        if obj.id not in ids:
+            objects.append(obj)
+            ids.append(obj.id)
+    return objects
+
 def objCmd(cmd):
     sp = cmd.split(' ')
     # Look for object commands
     found = False
-    if len(state.room.objects) and len(sp) > 1:
-        for obj in state.room.objects:
+    objects = getAllObjects()
+    if len(objects) and len(sp) > 1:
+        for obj in objects:
             if obj.id == sp[1]:
                 for act in obj.actions:
                     if sp[0] in act.triggers:
@@ -444,7 +454,7 @@ def objCmd(cmd):
                                         if not inInventory(key):
                                             ifTrue = False
                                 else:
-                                    propFileName = getPropFileName(state.room.user, state.room.x, state.room.y, obj, condition[0])
+                                    propFileName = getPropFileName(obj, condition[0])
                                     propFile = open(propFileName,'r')
                                     if propFile.read().strip() == condition[1]:
                                         ifTrue = True
@@ -470,10 +480,10 @@ def objCmd(cmd):
                                     elif i.startswith('GRAB'):
                                         for obj in state.room.objects:
                                             if obj.id == i[5:]:
-                                                addToInventory(obj)
+                                                addToInventory(obj,state.locX,state.locY)
                                     elif i.startswith('SET'):
                                         info = i[4:].split('=')
-                                        propFileName = getPropFileName(state.room.user, state.room.x, state.room.y, obj, info[0])
+                                        propFileName = getPropFileName(obj, info[0])
                                         propFile = open(propFileName,'w')
                                         propFile.write(info[1])
                                         propFile.close()
@@ -501,7 +511,7 @@ def help():
     prnt('about              Displays information about the author and project')
 
 def about():
-    prnt('Version:      1.0.2')
+    prnt('Version:      1.1.0')
     prnt('Author:       ~dustin')
     prnt('Source:       https://github.com/0xdstn/tilde-world')
     prnt('More info:    https://tilde.town/~dustin/projects/tilde-world')
