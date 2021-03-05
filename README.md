@@ -125,14 +125,13 @@ As a user of the game you can run the following commands:
 - `help` - Displays the help menu
 - `about` - Displays information about the author and project
 
-2 Future plans
+## Future plans
 
 - Add more action logic
 
-2 Release notes
+## Release notes
 
 - `v1.1.0` Changed inventory system so you can use item actions after grabbing them
 - `v1.0.2` Added TELEPORT action instruction
 - `v1.0.1` Added help and about commands
 - `v1.0.0` Initial release with base functionality
-
