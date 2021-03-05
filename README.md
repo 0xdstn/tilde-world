@@ -36,6 +36,7 @@ Rooms have the following properties available:
 - `NAME` - The name of the room
 - `DESC` - A description of the room. This is displayed with the **look** command
 - `KEY` - Optional. An ID and name of an item required to enter this room from any direction in this format: **west-key|West room key**
+- `TELEPORT` - Optional. x,y coordinates to redirect the user to if they teleport here (such as the start of a dungeon).
 
 ## Objects
 
@@ -131,6 +132,7 @@ As a user of the game you can run the following commands:
 
 ## Release notes
 
+- `v1.1.1` Added TELEPORT prop to rooms  to provide x,y coordinates to redirect the user to if they teleport to the room (such as the start of a dungeon)
 - `v1.1.0` Changed inventory system so you can use item actions after grabbing them
 - `v1.0.2` Added TELEPORT action instruction
 - `v1.0.1` Added help and about commands

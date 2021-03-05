@@ -26,12 +26,14 @@ class Room:
         self.objects = []
         self.exits = []
         self.key = ''
+        self.teleport = ''
 
     def setItem(self, key, val):
         if key == 'name': self.name = val
         elif key == 'key': self.key = val
         elif key == 'desc': self.desc = val
         elif key == 'objects': self.objects = val
+        elif key == 'teleport': self.teleport = val
 
 class Object:
     def __init__(self):
@@ -290,13 +292,14 @@ def lookObj(cmd):
                     desc = desc.replace('[' + prop.key + ']', prop.value)
             prnt(desc)
             if len(obj.actions) or obj.grab:
-                print('')
                 actionsOut = ['You can:']
                 if obj.grab and not inInventory(obj.id):
                     actionsOut.append('- grab')
                 for actn in obj.actions:
                     actionsOut.append('- ' + actn.triggers[0])
-                prnt(actionsOut)
+                if len(actionsOut) > 1:
+                    print('')
+                    prnt(actionsOut)
 
     if not found:
         prnt('Object not found')
@@ -419,6 +422,11 @@ def teleport(cmd):
     tmpY = int(tmpCoords[1])
     if len(tmpCoords) == 2:
         moveTo(tmpX,tmpY)
+        if len(state.room.teleport):
+            telCoords = state.room.teleport.split(',')
+            if len(telCoords) == 2:
+                prnt('Being redirected to dungeon start..')
+                moveTo(int(telCoords[0]),int(telCoords[1]))
 
 def getAllObjects():
     objects = []
@@ -511,7 +519,7 @@ def help():
     prnt('about              Displays information about the author and project')
 
 def about():
-    prnt('Version:      1.1.0')
+    prnt('Version:      1.1.1')
     prnt('Author:       ~dustin')
     prnt('Source:       https://github.com/0xdstn/tilde-world')
     prnt('More info:    https://tilde.town/~dustin/projects/tilde-world')
