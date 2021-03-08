@@ -437,6 +437,16 @@ def getAllObjects():
             ids.append(obj.id)
     return objects
 
+def updateProp(obj,key,value):
+    propFileName = getPropFileName(obj, key)
+    propFile = open(propFileName,'w')
+    propFile.write(value)
+    propFile.close()
+
+    for prop in obj.props:
+        if prop.key == key:
+            prop.value = value
+
 def objCmd(cmd):
     sp = cmd.split(' ')
     # Look for object commands
@@ -480,7 +490,17 @@ def objCmd(cmd):
                                     runCmd = False
                                 if runCmd:
                                     if i.startswith('ECHO'):
-                                        prnt(i[5:])
+                                        message = i[5:]
+                                        if len(obj.props):
+                                            for prop in obj.props:
+                                                message = message.replace('[' + prop.key + ']', prop.value)
+                                        prnt(message)
+                                    elif i.startswith('PROMPT'):
+                                        info = i[7:].split('|')
+                                        if len(info) == 2:
+                                            prnt(info[1])
+                                            resp = input('  > ').strip()
+                                            updateProp(obj,info[0],resp)
                                     elif i.startswith('TELEPORT'):
                                         coords = i[9:].split(' ')
                                         if len(coords) == 2:
@@ -491,14 +511,7 @@ def objCmd(cmd):
                                                 addToInventory(obj,state.locX,state.locY)
                                     elif i.startswith('SET'):
                                         info = i[4:].split('=')
-                                        propFileName = getPropFileName(obj, info[0])
-                                        propFile = open(propFileName,'w')
-                                        propFile.write(info[1])
-                                        propFile.close()
-
-                                        for prop in obj.props:
-                                            if prop.key == info[0]:
-                                                prop.value = info[1]
+                                        updateProp(obj,info[0],info[1])
                         break
     if not found:
         prnt('Command not found')
@@ -519,7 +532,7 @@ def help():
     prnt('about              Displays information about the author and project')
 
 def about():
-    prnt('Version:      1.1.1')
+    prnt('Version:      1.1.2')
     prnt('Author:       ~dustin')
     prnt('Source:       https://github.com/0xdstn/tilde-world')
     prnt('More info:    https://tilde.town/~dustin/projects/tilde-world')

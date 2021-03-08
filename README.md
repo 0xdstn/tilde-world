@@ -103,12 +103,13 @@ When the user runs **turn lamp** it will either turn the power prop on or off de
 
 Actions currently support the following:
 
-- `IF prop_name=value` - If prop of the item is the provided value, all following instructions until an **ELSE** or **ENDIF** will be run
-- `IF INVENTORY=item1,item2` - If the inventory contains the provided item(s), all following instructions until an **ELSE** or **ENDIF** will be run
+- `IF [prop]=[value]` - If prop of the item is the provided value, all following instructions until an **ELSE** or **ENDIF** will be run
+- `IF INVENTORY=[item1,item2]` - If the inventory contains the provided item(s), all following instructions until an **ELSE** or **ENDIF** will be run
 - `ELSE` - Placed between an **IF** and **ENDIF**. If the IF statement is false, all following instructions until an **ENDIF** will be run
-- `ECHO message` - Prints out the provided message
-- `GRAB object` - Adds the provided object key to the inventory (must also be in the same room, hidden or not)
-- `TELEPORT x y` - Teleports to provided x,y coordinates
+- `ECHO [message]` - Prints out the provided message. Props will be replaced with their value in the format **[prop]**
+- `GRAB [object]` - Adds the provided object key to the inventory (must also be in the same room, hidden or not)
+- `TELEPORT [x] [y]` - Teleports to provided x,y coordinates
+- `PROMPT [prop]|[message]` - Prompts the user with the message. Their input is stored in the provided prop
 
 ## Game commands
 
@@ -132,7 +133,8 @@ As a user of the game you can run the following commands:
 
 ## Release notes
 
-- `v1.1.1` Added TELEPORT prop to rooms  to provide x,y coordinates to redirect the user to if they teleport to the room (such as the start of a dungeon)
+- `v1.1.2` Added PROMPT action instruction. Updated ECHO to support displaying props
+- `v1.1.1` Added TELEPORT prop to rooms to provide x,y coordinates to redirect the user to if they teleport to the room (such as the start of a dungeon)
 - `v1.1.0` Changed inventory system so you can use item actions after grabbing them
 - `v1.0.2` Added TELEPORT action instruction
 - `v1.0.1` Added help and about commands
